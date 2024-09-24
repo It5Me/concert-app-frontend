@@ -3,6 +3,7 @@
 import ConcertList from '@/app/components/ConcertList';
 import CreateConcertForm from '@/app/components/CreateConcertForm';
 import Modal from '@/app/components/Modal';
+import StatBox from '@/app/components/StatBox';
 import Tabs from '@/app/components/Tabs';
 import { useState } from 'react';
 
@@ -43,44 +44,24 @@ export default function AdminDashboard() {
     <div className='min-h-screen flex flex-col lg:flex-row bg-gray-100'>
       <main className='flex-1 p-4 md:p-6 bg-white'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8'>
-          <div className='bg-blue-500 text-white p-4 md:p-6 rounded-lg shadow-lg flex flex-col items-center'>
-            <i className='fas fa-users text-2xl md:text-3xl'></i>
-            <h3 className='text-lg md:text-xl font-semibold mt-2 md:mt-4'>
-              Total of seats
-            </h3>
-            <span className='text-3xl md:text-4xl font-bold'>500</span>
-          </div>
-          <div className='bg-green-500 text-white p-4 md:p-6 rounded-lg shadow-lg flex flex-col items-center'>
-            <i className='fas fa-ticket-alt text-2xl md:text-3xl'></i>
-            <h3 className='text-lg md:text-xl font-semibold mt-2 md:mt-4'>
-              Reserve
-            </h3>
-            <span className='text-3xl md:text-4xl font-bold'>120</span>
-          </div>
-          <div className='bg-red-500 text-white p-4 md:p-6 rounded-lg shadow-lg flex flex-col items-center'>
-            <i className='fas fa-times-circle text-2xl md:text-3xl'></i>
-            <h3 className='text-lg md:text-xl font-semibold mt-2 md:mt-4'>
-              Cancel
-            </h3>
-            <span className='text-3xl md:text-4xl font-bold'>12</span>
-          </div>
+          <StatBox label='Total of seats' value={500} color='#1E90FF' />{' '}
+          <StatBox label='Reserve' value={120} color='#28a745' />
+          <StatBox label='Cancel' value={12} color='#f44336' />
         </div>
 
         <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
 
-        <div className='p-4 md:p-6 bg-white rounded-lg shadow-md'>
-          {activeTab === 'overview' && (
-            <ConcertList
-              concerts={concerts}
-              onDeleteConcert={handleDeleteClick}
-            />
-          )}
-          {activeTab === 'create-concert' && (
-            <div>
-              <CreateConcertForm />
-            </div>
-          )}
-        </div>
+        {activeTab === 'overview' && (
+          <ConcertList
+            concerts={concerts}
+            onDeleteConcert={handleDeleteClick}
+          />
+        )}
+        {activeTab === 'create-concert' && (
+          <div>
+            <CreateConcertForm />
+          </div>
+        )}
 
         <Modal
           isOpen={isModalOpen}
