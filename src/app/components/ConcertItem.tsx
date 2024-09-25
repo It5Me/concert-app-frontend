@@ -1,4 +1,5 @@
 interface ConcertItemProps {
+  id: string;
   name: string;
   description: string;
   attendees: number;

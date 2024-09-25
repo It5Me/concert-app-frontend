@@ -1,43 +1,101 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
-import ConcertList from '@/app/components/ConcertList';
+import ConcertList, { Concert } from '@/app/components/ConcertList';
 import CreateConcertForm from '@/app/components/CreateConcertForm';
 import Modal from '@/app/components/Modal';
 import StatBox from '@/app/components/StatBox';
 import Tabs from '@/app/components/Tabs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function AdminDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [error, setError] = useState<string | null>(null);
+  const [concerts, setConcerts] = useState<Concert[]>([]);
+  const [concertToDelete, setConcertToDelete] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
 
-  const [concerts, setConcerts] = useState([
-    {
-      name: 'Concert Name 1',
-      description: 'Lorem ipsum dolor...',
-      attendees: 500,
-    },
-    {
-      name: 'Concert Name 2',
-      description: 'Lorem ipsum dolor...',
-      attendees: 200,
-    },
-  ]);
+  useEffect(() => {
+    const fetchConcerts = async (page = 1) => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/concerts?page=${page}&limit=${limit}`
+        );
 
-  const handleDeleteClick = () => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch concerts');
+        }
+
+        const data = await response.json();
+        setConcerts(data.concerts);
+        setTotalPages(data.totalPages);
+        setCurrentPage(data.currentPage);
+      } catch (err) {
+        console.error('Error fetching concerts:', err);
+        setError('Failed to fetch concerts. Please try again later.');
+      }
+    };
+
+    fetchConcerts(currentPage);
+  }, [activeTab, currentPage]);
+
+  const handleDeleteClick = (concertId: string) => {
+    setConcertToDelete(concertId);
     setIsModalOpen(true);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setConcertToDelete(null);
   };
 
-  const handleConfirm = () => {
-    setIsModalOpen(false);
+  const handleConfirm = async () => {
+    if (concertToDelete) {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/concerts/${concertToDelete}`,
+          {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to delete concert');
+        }
+
+        setConcerts((prevConcerts) =>
+          prevConcerts.filter((concert) => concert.id !== concertToDelete)
+        );
+
+        setIsModalOpen(false);
+        setConcertToDelete(null);
+      } catch (err) {
+        console.error('Error deleting concert:', err);
+        setError('Failed to delete concert. Please try again later.');
+      }
+    }
   };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
   return (
@@ -52,25 +110,50 @@ export default function AdminDashboard() {
         <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
 
         {activeTab === 'overview' && (
-          <ConcertList
-            concerts={concerts}
-            onDeleteConcert={handleDeleteClick}
-          />
+          <>
+            <ConcertList
+              concerts={concerts}
+              onDeleteConcert={handleDeleteClick}
+            />
+
+            <div className='flex justify-between mt-4'>
+              <button
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                className='bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300'
+              >
+                Previous
+              </button>
+
+              <span className='text-gray-700'>
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className='bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300'
+              >
+                Next
+              </button>
+            </div>
+          </>
         )}
+
         {activeTab === 'create-concert' && (
           <div>
             <CreateConcertForm />
           </div>
         )}
-
-        <Modal
-          isOpen={isModalOpen}
-          title='Are you sure to delete?'
-          content={'test'}
-          onCancel={handleCancel}
-          onConfirm={handleConfirm}
-        />
       </main>
+
+      <Modal
+        isOpen={isModalOpen}
+        title='Are you sure to delete?'
+        content={`You are about to delete this concert. This action cannot be undone.`}
+        onCancel={handleCancel}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }

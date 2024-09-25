@@ -1,14 +1,15 @@
 import ConcertItem from './ConcertItem';
 
-interface Concert {
+export interface Concert {
+  id: string;
   name: string;
   description: string;
-  attendees: number;
+  reservedSeats: number;
 }
 
 interface ConcertListProps {
   concerts: Concert[];
-  onDeleteConcert: (name: string) => void;
+  onDeleteConcert: (concertId: string) => void;
 }
 
 export default function ConcertList({
@@ -17,16 +18,15 @@ export default function ConcertList({
 }: ConcertListProps) {
   return (
     <div className='bg-white rounded-lg shadow-lg p-6 mb-6'>
-      <h3 className='text-xl font-semibold mb-4'>Overview</h3>
-
-      <div className='space-y-4'>
-        {concerts.map((concert) => (
+      <div className='space-y-4 overflow-y-auto flex-grow h-[calc(100vh-350px)]'>
+        {concerts?.map((concert) => (
           <ConcertItem
-            key={concert.name}
+            key={concert.id}
+            id={concert.id}
             name={concert.name}
             description={concert.description}
-            attendees={concert.attendees}
-            onDelete={() => onDeleteConcert(concert.name)}
+            attendees={concert.reservedSeats}
+            onDelete={() => onDeleteConcert(concert.id)}
           />
         ))}
       </div>
