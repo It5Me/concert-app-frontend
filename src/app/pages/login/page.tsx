@@ -1,14 +1,14 @@
 'use client';
+
 import { useState } from 'react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log({ email, password });
   };
 
   return (
@@ -17,16 +17,13 @@ export default function LoginPage() {
         <h2 className='text-2xl font-semibold text-center mb-6 text-gray-700'>
           Login
         </h2>
+        {error && <p className='text-red-500 text-center mb-4'>{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className='mb-4'>
-            <label
-              htmlFor='email'
-              className='block text-sm font-medium text-gray-700'
-            >
-              Email
+            <label className='block text-sm font-medium text-gray-700'>
+              Username
             </label>
             <input
-              type='email'
               id='email'
               className='mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
               value={email}
