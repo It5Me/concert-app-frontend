@@ -17,7 +17,7 @@ export default function Sidebar() {
 
   useEffect(() => {
     const userRole = localStorage.getItem('role');
-    setRole('admin');
+    setRole(userRole);
     if (userRole === 'admin') {
       setCurrentMode('admin');
     }
@@ -30,6 +30,7 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     router.push('/pages/login');
+    localStorage.clear();
   };
 
   return (

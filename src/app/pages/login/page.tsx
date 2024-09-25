@@ -1,14 +1,47 @@
 'use client';
-
+import { jwtDecode } from 'jwt-decode';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+
+interface DecodedToken {
+  exp: number;
+  iat: number;
+  role: string;
+  sub: number;
+  username: string;
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    try {
+      const response = await fetch('http://localhost:8080/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const token = await response.text();
+        const decodedToken = jwtDecode<DecodedToken>(token);
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', decodedToken.role);
+
+        router.push('/pages/dashboard');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Invalid login credentials');
+      }
+    } catch {
+      setError('An unexpected error occurred. Please try again later.');
+    }
   };
 
   return (
@@ -54,12 +87,6 @@ export default function LoginPage() {
             Login
           </button>
         </form>
-        <p className='text-center text-sm text-gray-600 mt-4'>
-          Don’t have an account?{' '}
-          <a href='/signup' className='text-blue-500 hover:underline'>
-            Sign up
-          </a>
-        </p>
       </div>
     </div>
   );
