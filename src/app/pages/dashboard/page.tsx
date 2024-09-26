@@ -1,159 +1,43 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
-import ConcertList, { Concert } from '@/app/components/ConcertList';
-import CreateConcertForm from '@/app/components/CreateConcertForm';
-import Modal from '@/app/components/Modal';
-import StatBox from '@/app/components/StatBox';
-import Tabs from '@/app/components/Tabs';
 import { useEffect, useState } from 'react';
+import AdminView from './AdminView';
+import UserConcertList from './UserConcertList';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/app/context/UserContext';
 
-export default function AdminDashboard() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [error, setError] = useState<string | null>(null);
-  const [concerts, setConcerts] = useState<Concert[]>([]);
-  const [concertToDelete, setConcertToDelete] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const limit = 10;
+export default function Dashboard() {
+  const router = useRouter();
+  const { role: contextRole, currentMode } = useUser();
+  const [role, setRole] = useState<string | null>(contextRole || '');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchConcerts = async (page = 1) => {
-      try {
-        const response = await fetch(
-          `http://localhost:8080/concerts?page=${page}&limit=${limit}`
-        );
+    const storedRole = localStorage.getItem('role');
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch concerts');
-        }
-
-        const data = await response.json();
-        setConcerts(data.concerts);
-        setTotalPages(data.totalPages);
-        setCurrentPage(data.currentPage);
-      } catch (err) {
-        console.error('Error fetching concerts:', err);
-        setError('Failed to fetch concerts. Please try again later.');
-      }
-    };
-
-    fetchConcerts(currentPage);
-  }, [activeTab, currentPage]);
-
-  const handleDeleteClick = (concertId: string) => {
-    setConcertToDelete(concertId);
-    setIsModalOpen(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setConcertToDelete(null);
-  };
-
-  const handleConfirm = async () => {
-    if (concertToDelete) {
-      try {
-        const response = await fetch(
-          `http://localhost:8080/concerts/${concertToDelete}`,
-          {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to delete concert');
-        }
-
-        setConcerts((prevConcerts) =>
-          prevConcerts.filter((concert) => concert.id !== concertToDelete)
-        );
-
-        setIsModalOpen(false);
-        setConcertToDelete(null);
-      } catch (err) {
-        console.error('Error deleting concert:', err);
-        setError('Failed to delete concert. Please try again later.');
-      }
+    if (!contextRole && storedRole) {
+      setRole(storedRole);
+    } else if (!contextRole && !storedRole) {
+      router.push('/pages/login');
+    } else {
+      setRole(contextRole);
     }
-  };
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
+    setLoading(false);
+  }, [contextRole, router]);
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  if (loading) {
+    return (
+      <div className='min-h-screen flex justify-center items-center'>
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen flex flex-col lg:flex-row bg-gray-100'>
       <main className='flex-1 p-4 md:p-6 bg-white'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8'>
-          <StatBox label='Total of seats' value={500} color='#1E90FF' />{' '}
-          <StatBox label='Reserve' value={120} color='#28a745' />
-          <StatBox label='Cancel' value={12} color='#f44336' />
-        </div>
-
-        <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
-
-        {activeTab === 'overview' && (
-          <>
-            <ConcertList
-              concerts={concerts}
-              onDeleteConcert={handleDeleteClick}
-            />
-
-            <div className='flex justify-between mt-4'>
-              <button
-                onClick={handlePreviousPage}
-                disabled={currentPage === 1}
-                className='bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300'
-              >
-                Previous
-              </button>
-
-              <span className='text-gray-700'>
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className='bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300'
-              >
-                Next
-              </button>
-            </div>
-          </>
-        )}
-
-        {activeTab === 'create-concert' && (
-          <div>
-            <CreateConcertForm />
-          </div>
-        )}
+        {currentMode === 'admin' ? <AdminView /> : <UserConcertList />}
       </main>
-
-      <Modal
-        isOpen={isModalOpen}
-        title='Are you sure to delete?'
-        content={`You are about to delete this concert. This action cannot be undone.`}
-        onCancel={handleCancel}
-        onConfirm={handleConfirm}
-      />
     </div>
   );
 }

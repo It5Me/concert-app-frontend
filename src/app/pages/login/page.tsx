@@ -1,4 +1,5 @@
 'use client';
+import { useUser } from '@/app/context/UserContext';
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -17,6 +18,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  const { handleLogin } = useUser();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -33,6 +36,7 @@ export default function LoginPage() {
 
         localStorage.setItem('token', token);
         localStorage.setItem('role', decodedToken.role);
+        handleLogin(decodedToken.role, 'user');
 
         router.push('/pages/dashboard');
       } else {
