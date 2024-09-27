@@ -26,7 +26,7 @@ export default function UserConcertList() {
     const fetchConcerts = async (page = 1) => {
       try {
         const response = await fetch(
-          `http://localhost:8080/concerts?page=${page}&limit=${limit}`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/concerts?page=${page}&limit=${limit}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -75,8 +75,8 @@ export default function UserConcertList() {
 
     try {
       const url = isReserved
-        ? `http://localhost:8080/reservations/${concertId}/user/${userId}/cancel`
-        : `http://localhost:8080/reservations/${concertId}/user/${userId}`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/reservations/${concertId}/user/${userId}/cancel`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL}/reservations/${concertId}/user/${userId}`;
 
       const method = isReserved ? 'PATCH' : 'POST';
 
@@ -95,7 +95,7 @@ export default function UserConcertList() {
       }
 
       const updatedResponse = await fetch(
-        `http://localhost:8080/concerts?page=${currentPage}&limit=${limit}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/concerts?page=${currentPage}&limit=${limit}`,
         {
           headers: {
             'Content-Type': 'application/json',

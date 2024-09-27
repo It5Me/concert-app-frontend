@@ -27,7 +27,7 @@ export default function ReservationHistory() {
         try {
           const token = localStorage.getItem('token');
           const response = await fetch(
-            'http://localhost:8080/reservations/admin/reservations',
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/reservations/admin/reservations`,
             {
               method: 'GET',
               headers: {

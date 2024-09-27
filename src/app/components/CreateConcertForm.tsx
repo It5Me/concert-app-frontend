@@ -17,14 +17,17 @@ export default function CreateConcertForm() {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/concerts/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(concertData),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/concerts/create`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(concertData),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();

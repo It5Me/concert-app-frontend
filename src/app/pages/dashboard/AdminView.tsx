@@ -23,7 +23,7 @@ export default function AdminDashboard() {
     const fetchConcerts = async (page = 1) => {
       try {
         const response = await fetch(
-          `http://localhost:8080/concerts?page=${page}&limit=${limit}`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/concerts?page=${page}&limit=${limit}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
     if (concertToDelete) {
       try {
         const response = await fetch(
-          `http://localhost:8080/concerts/${concertToDelete}`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/concerts/${concertToDelete}`,
           {
             method: 'DELETE',
             headers: {
