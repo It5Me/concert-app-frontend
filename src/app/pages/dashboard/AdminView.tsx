@@ -24,10 +24,14 @@ export default function AdminDashboard() {
     const fetchConcerts = async (page = 1) => {
       try {
         const response = await fetch(
-          `http://localhost:8080/concerts?page=${page}&limit=${limit}`
+          `http://localhost:8080/concerts?page=${page}&limit=${limit}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
         );
-
-        console.log('response', response);
 
         if (!response.ok) {
           throw new Error('Failed to fetch concerts');

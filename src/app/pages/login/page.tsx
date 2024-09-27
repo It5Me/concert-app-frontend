@@ -2,7 +2,7 @@
 import { useUser } from '@/app/context/UserContext';
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface DecodedToken {
   exp: number;
@@ -31,9 +31,11 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
-        const token = await response.text();
-        const decodedToken = jwtDecode<DecodedToken>(token);
+        const responseData = await response.json();
+        const token = responseData.access_token;
+        localStorage.setItem('token', token);
 
+        const decodedToken = jwtDecode<DecodedToken>(token);
         handleLogin(decodedToken.role, 'user', decodedToken.sub);
 
         router.push('/pages/dashboard');

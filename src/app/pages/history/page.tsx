@@ -22,8 +22,17 @@ export default function ReservationHistory() {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
+        const token = localStorage.getItem('token');
+
         const response = await fetch(
-          'http://localhost:8080/reservations/admin/reservations'
+          'http://localhost:8080/reservations/admin/reservations',
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         if (!response.ok) {

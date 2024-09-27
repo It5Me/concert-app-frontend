@@ -26,7 +26,13 @@ export default function UserConcertList() {
     const fetchConcerts = async (page = 1) => {
       try {
         const response = await fetch(
-          `http://localhost:8080/concerts?page=${page}&limit=${limit}`
+          `http://localhost:8080/concerts?page=${page}&limit=${limit}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
         );
 
         if (!response.ok) {
@@ -89,7 +95,13 @@ export default function UserConcertList() {
       }
 
       const updatedResponse = await fetch(
-        `http://localhost:8080/concerts?page=${currentPage}&limit=${limit}`
+        `http://localhost:8080/concerts?page=${currentPage}&limit=${limit}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
       );
 
       if (!updatedResponse.ok) {
