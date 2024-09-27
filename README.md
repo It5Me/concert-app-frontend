@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Getting Started with Next.js
 
-## Getting Started
+## Introduction
 
-First, run the development server:
+Welcome to the Next.js project! This guide will help you set up and run the application locally for development and testing purposes.
+
+## Branch Selection
+
+Before you begin, ensure you're working on the main branch:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git checkout main
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Follow these steps to set up the project:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Clone the Repository
 
-## Learn More
+If you haven't already, clone the repository to your local machine:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+git clone https://github.com/It5Me/concert-app-frontend.git
+cd your-project
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Install Dependencies
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Install the required dependencies using npm:
+Copy code
 
-## Deploy on Vercel
+```bash
+npm install
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 3. Set Up Environment Variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+```
+
+### Available Scripts
+
+In the project directory, you can run the following scripts:
+Description: Runs the app in development mode.
+Usage:
+```bash
+npm run dev
+```
+
+###  Open Login Page: Navigate to http://localhost:3000/pages/login to access the login page directly.
+
+
+
+
+### npm run build
+Description: Builds the app for production.
+
+Copy code
+```bash
+npm run build
+```
+
+
+
+### API Integration
+The application communicates with the backend API specified by NEXT_PUBLIC_API_BASE_URL in the .env file.
+Ensure the backend server is running and accessible at the specified URL
