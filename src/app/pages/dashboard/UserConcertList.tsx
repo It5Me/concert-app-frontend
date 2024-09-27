@@ -1,11 +1,17 @@
+import { useUser } from '@/app/context/UserContext';
 import { useEffect, useState } from 'react';
+import { HiOutlineUser } from 'react-icons/hi';
 
 export interface Concert {
-  id: string;
-  name: string;
   description: string;
+  id: number;
+  name: string;
+  reservations: Array<{
+    action: string;
+    userId: number;
+  }>;
+  reservedSeats: number;
   totalSeats: number;
-  reserved: boolean;
 }
 
 export default function UserConcertList() {
@@ -13,7 +19,8 @@ export default function UserConcertList() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 5;
+  const limit = 4;
+  const { userId } = useUser();
 
   useEffect(() => {
     const fetchConcerts = async (page = 1) => {
@@ -47,8 +54,65 @@ export default function UserConcertList() {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
-  const handleReserveToggle = (concertId: string) => {
-    console.log(`Toggling reserve for concert ${concertId}`);
+  const handleReserveToggle = async (concertId: number) => {
+    if (!userId) {
+      console.error('User is not logged in.');
+      return;
+    }
+
+    const selectedConcert = concerts.find(
+      (concert) => concert.id === concertId
+    );
+    const isReserved = selectedConcert
+      ? isReservedByUser(selectedConcert)
+      : false;
+
+    try {
+      const url = isReserved
+        ? `http://localhost:8080/reservations/${concertId}/user/${userId}/cancel`
+        : `http://localhost:8080/reservations/${concertId}/user/${userId}`;
+
+      const method = isReserved ? 'PATCH' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to ${isReserved ? 'cancel' : 'reserve'} concert`
+        );
+      }
+
+      const updatedResponse = await fetch(
+        `http://localhost:8080/concerts?page=${currentPage}&limit=${limit}`
+      );
+
+      if (!updatedResponse.ok) {
+        throw new Error('Failed to fetch updated concert data');
+      }
+
+      const updatedData = await updatedResponse.json();
+      setConcerts(updatedData.concerts);
+    } catch (err) {
+      console.error('Error toggling reservation:', err);
+      setError(
+        `Failed to ${
+          isReserved ? 'cancel' : 'reserve'
+        } concert. Please try again later.`
+      );
+    }
+  };
+
+  const isReservedByUser = (concert: Concert) => {
+    return concert.reservations.some(
+      (reservation) =>
+        reservation.userId === userId && reservation.action === 'reserved'
+    );
   };
 
   return (
@@ -57,43 +121,74 @@ export default function UserConcertList() {
 
       {error && <p className='text-red-500'>{error}</p>}
 
-      <div className='grid gap-6'>
+      <div className='space-y-6'>
         {concerts.map((concert) => (
           <div
             key={concert.id}
-            className='border border-gray-200 rounded-lg p-4 mb-4'
+            className={`border ${
+              concert.totalSeats === 0
+                ? 'bg-red-50 border-red-200 shadow-lg'
+                : 'bg-white border-gray-200'
+            } rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-lg`}
           >
-            <h3 className='text-lg font-semibold text-blue-500 mb-2'>
-              {concert.name}
-            </h3>
-            <p className='text-gray-700 mb-4'>{concert.description}</p>
-
-            <div className='flex justify-between items-center'>
-              <div className='flex items-center'>
-                <span className='mr-2'>👤</span>
-                <span>{concert.totalSeats.toLocaleString()}</span>
-              </div>
-
-              <button
-                onClick={() => handleReserveToggle(concert.id)}
-                className={`px-4 py-2 rounded ${
-                  concert.reserved
-                    ? 'bg-red-500 text-white'
-                    : 'bg-blue-500 text-white'
+            <div className='flex justify-between items-center mb-2'>
+              <h3
+                className={`text-xl font-bold ${
+                  concert.totalSeats === 0 ? 'text-red-600' : 'text-blue-600'
                 }`}
               >
-                {concert.reserved ? 'Cancel' : 'Reserve'}
+                {concert.name}
+              </h3>
+
+              {concert.totalSeats === 0 && (
+                <div className='flex items-center'>
+                  <span className='px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm font-medium'>
+                    Sold Out
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <p className='text-gray-600 mb-4'>{concert.description}</p>
+
+            <div className='flex justify-between items-center'>
+              <div className='flex items-center text-gray-700'>
+                <HiOutlineUser className='h-6 w-6 text-gray-500' />
+                <span className='ml-2 font-medium'>
+                  {concert.totalSeats === 0
+                    ? 'No Seats Available'
+                    : `${concert.totalSeats.toLocaleString()} Seats`}
+                </span>
+              </div>
+              <button
+                onClick={() => handleReserveToggle(concert.id)}
+                disabled={
+                  concert.totalSeats === 0 && !isReservedByUser(concert)
+                }
+                className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
+                  concert.totalSeats === 0 && !isReservedByUser(concert)
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : isReservedByUser(concert)
+                    ? 'bg-red-500 text-white hover:bg-red-600'
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+              >
+                {isReservedByUser(concert)
+                  ? 'Cancel'
+                  : concert.totalSeats === 0
+                  ? 'Sold Out'
+                  : 'Reserve'}
               </button>
             </div>
           </div>
         ))}
       </div>
 
-      <div className='flex justify-between mt-4'>
+      <div className='flex justify-between mt-8'>
         <button
           onClick={handlePreviousPage}
           disabled={currentPage === 1}
-          className='bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300'
+          className='bg-blue-500 text-white px-6 py-3 rounded-lg disabled:bg-gray-300'
         >
           Previous
         </button>
@@ -105,7 +200,7 @@ export default function UserConcertList() {
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className='bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300'
+          className='bg-blue-500 text-white px-6 py-3 rounded-lg disabled:bg-gray-300'
         >
           Next
         </button>

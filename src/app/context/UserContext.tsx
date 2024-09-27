@@ -5,8 +5,9 @@ interface RoleModeContextProps {
   currentMode: string;
   toggleMode: () => void;
   role: string;
+  userId: number | null;
   handleLogout: () => void;
-  handleLogin: (role: string, mode: string) => void;
+  handleLogin: (role: string, mode: string, userId: number) => void;
 }
 
 const RoleModeContext = createContext<RoleModeContextProps | undefined>(
@@ -16,15 +17,18 @@ const RoleModeContext = createContext<RoleModeContextProps | undefined>(
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentMode, setCurrentMode] = useState<string>('');
   const [role, setRole] = useState<string>('');
+  const [userId, setUserId] = useState<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const savedMode = localStorage.getItem('mode');
     const savedRole = localStorage.getItem('role');
+    const savedUserId = localStorage.getItem('userId');
 
-    if (savedMode && savedRole) {
+    if (savedMode && savedRole && savedUserId) {
       setCurrentMode(savedMode);
       setRole(savedRole);
+      setUserId(parseInt(savedUserId, 10));
     }
   }, []);
 
@@ -39,20 +43,30 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleLogout = () => {
     localStorage.clear();
+    setUserId(null);
     router.push('/pages/login');
   };
 
-  const handleLogin = (role: string, mode: string) => {
+  const handleLogin = (role: string, mode: string, userId: number) => {
     localStorage.setItem('role', role);
     localStorage.setItem('mode', mode);
+    localStorage.setItem('userId', userId.toString());
     setRole(role);
     setCurrentMode(mode);
+    setUserId(userId);
     router.push('/pages/dashboard');
   };
 
   return (
     <RoleModeContext.Provider
-      value={{ currentMode, toggleMode, role, handleLogout, handleLogin }}
+      value={{
+        currentMode,
+        toggleMode,
+        role,
+        userId,
+        handleLogout,
+        handleLogin,
+      }}
     >
       {children}
     </RoleModeContext.Provider>

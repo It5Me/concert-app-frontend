@@ -34,9 +34,7 @@ export default function LoginPage() {
         const token = await response.text();
         const decodedToken = jwtDecode<DecodedToken>(token);
 
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', decodedToken.role);
-        handleLogin(decodedToken.role, 'user');
+        handleLogin(decodedToken.role, 'user', decodedToken.sub);
 
         router.push('/pages/dashboard');
       } else {

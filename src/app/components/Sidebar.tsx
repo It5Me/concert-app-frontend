@@ -7,7 +7,6 @@ import {
 } from 'react-icons/hi';
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useUser } from '../context/UserContext';
 
 export default function Sidebar() {
@@ -46,7 +45,7 @@ export default function Sidebar() {
       <div
         className={`fixed inset-0 bg-white p-6 z-50 transform ${
           isOpen ? 'translate-y-0' : '-translate-y-full'
-        } transition-transform duration-300 ease-in-out lg:translate-y-0 lg:w-64 lg:relative lg:border-r lg:inset-auto flex flex-col justify-between`}
+        } transition-transform duration-300 ease-in-out lg:translate-y-0 lg:w-64 lg:relative lg:border-r lg:inset-auto flex flex-col justify-between min-h-screen`}
       >
         <button
           className='lg:hidden mb-4 focus:outline-none'
@@ -67,46 +66,46 @@ export default function Sidebar() {
             />
           </svg>
         </button>
-        <div>
-          <div className='text-lg font-semibold mb-6'>
-            {currentMode === 'admin' ? 'Admin' : 'User'}
-          </div>
-
-          <nav className='flex flex-col space-y-4'>
+        <div className='text-2xl font-semibold mb-6 lg:text-3xl'>
+          {currentMode === 'admin' ? 'Admin' : 'User'}
+        </div>
+        <nav className='flex-1'>
+          <div className='flex flex-col space-y-6'>
             {currentMode === 'admin' && (
               <Link
                 href='/pages/dashboard'
-                className='flex items-center space-x-2 text-gray-600 hover:text-blue-500'
+                className='flex items-center space-x-3 text-gray-700 hover:text-blue-600'
               >
-                <HiOutlineHome className='h-6 w-6 text-gray-500' />
+                <HiOutlineHome className='h-5 w-5' />
                 <span>Home</span>
               </Link>
             )}
             {currentMode === 'admin' && (
               <Link
                 href='/pages/history'
-                className='flex items-center space-x-2 text-gray-600 hover:text-blue-500'
+                className='flex items-center space-x-3 text-gray-700 hover:text-blue-600'
               >
-                <HiOutlineClock className='h-6 w-6 text-gray-500' />
+                <HiOutlineClock className='h-5 w-5' />
                 <span>History</span>
               </Link>
             )}
             {role === 'admin' && (
               <button
                 onClick={toggleMode}
-                className='flex items-center space-x-2 text-gray-600 text-left hover:text-blue-500'
+                className='flex items-center space-x-3 text-gray-700 text-left hover:text-blue-600'
               >
-                <HiOutlineSwitchHorizontal className='h-6 w-6 text-gray-500' />
+                <HiOutlineSwitchHorizontal className='h-5 w-5' />
                 <span>
-                  {currentMode === 'admin'
+                  {currentMode === 'admin' && role === 'admin'
                     ? 'Switch to User'
                     : 'Switch to Admin'}
                 </span>
               </button>
             )}
-          </nav>
-        </div>
-        <div className='xl:mb-5'>
+          </div>
+        </nav>
+
+        <div className='mt-auto lg:mb-8'>
           <button
             onClick={handleLogout}
             className='flex items-center space-x-2 text-gray-600 hover:text-blue-500'
