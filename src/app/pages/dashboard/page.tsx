@@ -1,29 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
 import AdminView from './AdminView';
 import UserConcertList from './UserConcertList';
-import { useRouter } from 'next/navigation';
 import { useUser } from '@/app/context/UserContext';
 
 export default function Dashboard() {
-  const router = useRouter();
-  const { role: contextRole, currentMode } = useUser();
-  const [role, setRole] = useState<string | null>(contextRole || '');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const storedRole = localStorage.getItem('role');
-
-    if (!contextRole && storedRole) {
-      setRole(storedRole);
-    } else if (!contextRole && !storedRole) {
-      router.push('/pages/login');
-    } else {
-      setRole(contextRole);
-    }
-
-    setLoading(false);
-  }, [contextRole, router]);
+  const { currentMode, loading } = useUser();
 
   if (loading) {
     return (

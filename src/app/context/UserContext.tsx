@@ -8,6 +8,7 @@ interface RoleModeContextProps {
   userId: number | null;
   handleLogout: () => void;
   handleLogin: (role: string, mode: string, userId: number) => void;
+  loading: boolean;
 }
 
 const RoleModeContext = createContext<RoleModeContextProps | undefined>(
@@ -18,6 +19,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentMode, setCurrentMode] = useState<string>('');
   const [role, setRole] = useState<string>('');
   const [userId, setUserId] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,8 +31,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       setCurrentMode(savedMode);
       setRole(savedRole);
       setUserId(parseInt(savedUserId, 10));
+    } else {
+      router.push('/pages/login');
     }
-  }, []);
+
+    setLoading(false);
+  }, [router]);
 
   const toggleMode = () => {
     setCurrentMode((prevMode) => {
@@ -66,6 +72,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         userId,
         handleLogout,
         handleLogin,
+        loading,
       }}
     >
       {children}

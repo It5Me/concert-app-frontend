@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import ConcertList, { Concert } from '@/app/components/ConcertList';
 import CreateConcertForm from '@/app/components/CreateConcertForm';
