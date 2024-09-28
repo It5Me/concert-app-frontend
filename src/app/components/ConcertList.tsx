@@ -4,7 +4,7 @@ export interface Concert {
   id: string;
   name: string;
   description: string;
-  reservedSeats: number;
+  totalSeats: number;
 }
 
 interface ConcertListProps {
@@ -25,7 +25,7 @@ export default function ConcertList({
             id={concert.id}
             name={concert.name}
             description={concert.description}
-            attendees={concert.reservedSeats}
+            totalSeats={concert.totalSeats}
             onDelete={() => onDeleteConcert(concert.id)}
           />
         ))}
