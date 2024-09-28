@@ -4,14 +4,6 @@
 
 Welcome to the Next.js project! This guide will help you set up and run the application locally for development and testing purposes.
 
-## Branch Selection
-
-Before you begin, ensure you're working on the main branch:
-
-```bash
-git checkout main
-```
-
 ## Installation
 
 Follow these steps to set up the project:
@@ -23,6 +15,13 @@ If you haven't already, clone the repository to your local machine:
 ```bash
 git clone https://github.com/It5Me/concert-app-frontend.git
 cd your-project
+```
+## Branch Selection
+
+Before you begin, ensure you're working on the main branch:
+
+```bash
+git checkout main
 ```
 
 ### 2. Install Dependencies
