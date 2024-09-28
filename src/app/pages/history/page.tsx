@@ -2,12 +2,13 @@
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import ReservationTable from './ReservationTable';
+import UserReservationTable from './UserReservationTable';
 import ReservationCardList from './ReservationCardList';
 import { useUser } from '@/app/context/UserContext';
 
 interface Reservation {
   createdAt: string;
-  user: {
+  user?: {
     username: string;
   };
   concert: {
@@ -19,23 +20,26 @@ interface Reservation {
 export default function ReservationHistory() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const { loading } = useUser();
+  const { loading, currentMode, userId } = useUser();
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && userId) {
       const fetchReservations = async () => {
         try {
           const token = localStorage.getItem('token');
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/reservations/admin/reservations`,
-            {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+
+          const apiUrl =
+            currentMode === 'admin'
+              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/reservations/admin/reservations`
+              : `${process.env.NEXT_PUBLIC_API_BASE_URL}/reservations/user/${userId}`;
+
+          const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
           if (!response.ok) {
             throw new Error('Failed to fetch reservation history');
@@ -51,7 +55,7 @@ export default function ReservationHistory() {
 
       fetchReservations();
     }
-  }, [loading]);
+  }, [loading, userId, currentMode]);
 
   const formatDate = (dateString: string) => {
     return dayjs(dateString).format('DD/MM/YYYY HH:mm:ss');
@@ -67,12 +71,27 @@ export default function ReservationHistory() {
 
       {error && <p className='text-red-500'>{error}</p>}
 
-      <ReservationTable reservations={reservations} formatDate={formatDate} />
+      <div className='block sm:hidden'>
+        <ReservationCardList
+          reservations={reservations}
+          formatDate={formatDate}
+          mode={currentMode}
+        />
+      </div>
 
-      <ReservationCardList
-        reservations={reservations}
-        formatDate={formatDate}
-      />
+      <div className='hidden sm:block'>
+        {currentMode === 'user' ? (
+          <UserReservationTable
+            reservations={reservations}
+            formatDate={formatDate}
+          />
+        ) : (
+          <ReservationTable
+            reservations={reservations}
+            formatDate={formatDate}
+          />
+        )}
+      </div>
     </div>
   );
 }

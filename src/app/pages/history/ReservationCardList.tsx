@@ -2,7 +2,7 @@
 
 interface Reservation {
   createdAt: string;
-  user: {
+  user?: {
     username: string;
   };
   concert: {
@@ -14,11 +14,13 @@ interface Reservation {
 interface ReservationCardListProps {
   reservations: Reservation[];
   formatDate: (dateString: string) => string;
+  mode: string;
 }
 
 export default function ReservationCardList({
   reservations,
   formatDate,
+  mode,
 }: ReservationCardListProps) {
   return (
     <div className='sm:hidden'>
@@ -31,10 +33,12 @@ export default function ReservationCardList({
             <span className='font-semibold'>Date time:</span>
             <span>{formatDate(reservation.createdAt)}</span>
           </div>
-          <div className='flex justify-between mb-2'>
-            <span className='font-semibold'>Username:</span>
-            <span>{reservation.user.username}</span>
-          </div>
+          {mode === 'admin' && (
+            <div className='flex justify-between mb-2'>
+              <span className='font-semibold'>Username:</span>
+              <span>{reservation.user?.username}</span>
+            </div>
+          )}
           <div className='flex justify-between mb-2'>
             <span className='font-semibold'>Concert name:</span>
             <span>{reservation.concert.name}</span>

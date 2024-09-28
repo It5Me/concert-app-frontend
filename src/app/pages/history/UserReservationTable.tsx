@@ -2,34 +2,28 @@
 
 interface Reservation {
   createdAt: string;
-  user?: {
-    username: string;
-  };
   concert: {
     name: string;
   };
   action: string;
 }
 
-interface ReservationTableProps {
+interface UserReservationTableProps {
   reservations: Reservation[];
   formatDate: (dateString: string) => string;
 }
 
-export default function ReservationTable({
+export default function UserReservationTable({
   reservations,
   formatDate,
-}: ReservationTableProps) {
+}: UserReservationTableProps) {
   return (
-    <div className='block md:block overflow-x-auto'>
+    <div className='hidden sm:block overflow-x-auto'>
       <table className='min-w-full bg-white border border-gray-200 rounded-lg'>
         <thead className='bg-gray-50'>
           <tr>
             <th className='py-3 px-6 border-b text-left font-semibold text-gray-700 text-lg'>
               Date time
-            </th>
-            <th className='py-3 px-6 border-b text-left font-semibold text-gray-700 text-lg'>
-              Username
             </th>
             <th className='py-3 px-6 border-b text-left font-semibold text-gray-700 text-lg'>
               Concert name
@@ -49,9 +43,6 @@ export default function ReservationTable({
             >
               <td className='py-4 px-6 border-b text-gray-600'>
                 {formatDate(reservation.createdAt)}
-              </td>
-              <td className='py-4 px-6 border-b text-gray-600'>
-                {reservation.user?.username}
               </td>
               <td className='py-4 px-6 border-b text-gray-600'>
                 {reservation.concert.name}

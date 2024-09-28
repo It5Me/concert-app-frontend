@@ -71,24 +71,20 @@ export default function Sidebar() {
         </div>
         <nav className='flex-1'>
           <div className='flex flex-col space-y-6'>
-            {currentMode === 'admin' && (
-              <Link
-                href='/pages/dashboard'
-                className='flex items-center space-x-3 text-gray-700 hover:text-blue-600'
-              >
-                <HiOutlineHome className='h-5 w-5' />
-                <span>Home</span>
-              </Link>
-            )}
-            {currentMode === 'admin' && (
-              <Link
-                href='/pages/history'
-                className='flex items-center space-x-3 text-gray-700 hover:text-blue-600'
-              >
-                <HiOutlineClock className='h-5 w-5' />
-                <span>History</span>
-              </Link>
-            )}
+            <Link
+              href='/pages/dashboard'
+              className='flex items-center space-x-3 text-gray-700 hover:text-blue-600'
+            >
+              <HiOutlineHome className='h-5 w-5' />
+              <span>Home</span>
+            </Link>
+            <Link
+              href='/pages/history'
+              className='flex items-center space-x-3 text-gray-700 hover:text-blue-600'
+            >
+              <HiOutlineClock className='h-5 w-5' />
+              <span>History</span>
+            </Link>
             {role === 'admin' && (
               <button
                 onClick={toggleMode}
